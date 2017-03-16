@@ -1,0 +1,314 @@
+﻿using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Newtonsoft.Json;
+using Wwa.Entities;
+using Library.Randoms;
+using Library;
+using System.Web.Http;
+using System.Web.Http.Results;
+using Werewolves.RequestModel;
+
+namespace Werewolves.Controllers
+{
+    public class DoController : ApiController
+    {
+        // GET: Do
+        public IHttpActionResult Categories()
+        {
+            return Ok();
+           // return View();
+        }
+
+
+        [System.Web.Http.HttpPost]
+        public IHttpActionResult testpost([FromBody]testmodel a)
+        {
+            if (a == null) { return Ok("null"); }
+            else
+            {
+                return Ok("not null");
+            }
+
+        }
+        /// <summary>
+        /// 创建房间
+        /// </summary>
+        /// <returns></returns>
+        [System.Web.Http.HttpPost]
+        public IHttpActionResult CreateRoom([FromBody]CreateRoom_Ac_Request RequestMod)
+        {
+            try
+            {
+                if(RequestMod==null) throw new ArgumentException("非法访问");
+                if(RequestMod.Userid < 1) throw new ArgumentException("无此用户");
+                if(RequestMod.roles.Split(',').Length!=RequestMod.Pnum) throw new ArgumentException("角色与人数不对等");
+                var roles = RequestMod.roles.Split(',');
+                foreach (var role in roles)
+                {
+                    var Irole = Convert.ToInt32(role);
+                    var rolename=Enum.GetName(typeof(Wwa.Enum.wolverole), Irole);
+                    if(string.IsNullOrEmpty(rolename))
+                    {
+                        throw new ArgumentException("无此角色");
+                    }
+                }
+                int rid = Number.GetByPower();
+                using (MysqlDbContext db = new MysqlDbContext())
+                { 
+                    Rooms r = new Rooms
+                    {
+                        ID=1,
+                        CreateUserId = RequestMod.Userid,
+                        IsQuit = false,
+                        PersonsNum = RequestMod.Pnum,
+                        LogId = 1,
+                        RoomId = rid,
+                        Createtime=DateTime.Now
+                    };
+                    var Vic = Enum.GetName(typeof(Wwa.Enum.Victory), RequestMod.Victory);
+                    if (string.IsNullOrEmpty(Vic))
+                    {
+                        r.VictoryCondition = Wwa.Enum.Victory.屠边;
+                    }
+                    else
+                    {
+                        r.VictoryCondition = (Wwa.Enum.Victory)Enum.Parse(typeof(Wwa.Enum.Victory), Vic);
+                    }
+                    db.Rooms.Add(r);
+                    int i=db.SaveChanges();
+                    if(i>0)
+                    {
+                        CreateRoom_Ac_Response returndata = new CreateRoom_Ac_Response()
+                        {
+                           
+                            RoomID = rid,
+                            Pnum = RequestMod.Pnum,
+                            Victory = r.VictoryCondition
+                        };
+                        returndata.positions = Distribute.DistributeRole(roles);
+                        return Ok(new AjaxResult() { state = ResultType.success.ToString(),data= returndata});
+                    }
+                    else
+                    {
+                        return Ok(new AjaxResult() { state = ResultType.error.ToString(),message="房间创建失败"});
+                    }
+                }
+               
+            }
+            catch(MySqlException e)
+            {
+                LogFactory.GetLogger("").Error(Environment.NewLine + DateTime.Now + ":房间创建失败(数据库问题):" + e.Message);
+                return Ok(new AjaxResult() { state = ResultType.error.ToString(), message = e.Message });
+            }
+            catch (ArgumentException e)
+            {
+                return Ok(new AjaxResult() { state=ResultType.error.ToString(),message=e.Message});
+            }
+            catch(Exception e)
+            {
+                return Ok(new AjaxResult() { state = ResultType.error.ToString(), message = "非法操作:"+e.Message });
+            }
+        }
+        /// <summary>
+        /// 三级分类加载
+        /// </summary>
+        /// <returns></returns>
+        public string mysql()
+        {
+            var ajaxlist = new List<mm>();
+            string con = ConfigurationManager.ConnectionStrings["mysqlconnection1"].ToString();
+            using (MySqlConnection c = new MySqlConnection(con))
+            {
+                string sql = "select Id,Name,Path from lt_mall_categories";
+                c.Open();
+                using (MySqlCommand com = new MySqlCommand(sql, c))
+                {
+                    using (var dr = com.ExecuteReader())
+                    {
+                        if (dr.HasRows)
+                        {
+                            while (dr.Read())
+                            {
+                                var m = new mm()
+                                {
+                                    id = Convert.ToInt32(dr[0]),
+                                    name = dr[1].ToString(),
+                                    path = dr[2].ToString()
+                                };
+                                ajaxlist.Add(m);
+                            }
+                        }
+                    }
+                }
+            }
+            var ViewJson = new List<CategoryJsonModel>();
+            foreach (var cate in ajaxlist)
+            {
+                var patharray = cate.path.Split('|');
+                var first = patharray.Length > 0 ? Convert.ToInt32(patharray[0]) : 0;
+                var two = patharray.Length > 1 ? Convert.ToInt32(patharray[1]) : 0;
+                var three = patharray.Length > 2 ? Convert.ToInt32(patharray[2]) : 0;
+                var cateone = ajaxlist.Where(t => t.id == first).FirstOrDefault();
+                var categoryfirst = new CategoryJsonModel()
+                {
+                    Id = cateone.id,
+                    Name = cateone.name,
+                    SubCategory = new List<SecondLevelCategory>()
+                };
+                if (two == 0)
+                {
+                    ViewJson.Add(categoryfirst);
+                    continue;
+                }
+                var catetwo = ajaxlist.Where(t => t.id == two).FirstOrDefault();
+                var categorytwo = new SecondLevelCategory()
+                {
+                    Id = catetwo.id,
+                    Name = catetwo.name,
+                    SubCategory = new List<ThirdLevelCategoty>()
+                };
+                if (three == 0)
+                {
+                    var onefloor = ViewJson.FirstOrDefault(t => t.Id == cateone.id);
+                    onefloor.SubCategory.Add(categorytwo);
+                    continue;
+                }
+                var catethree = ajaxlist.Where(t => t.id == three).FirstOrDefault();
+                var categorythree = new ThirdLevelCategoty()
+                {
+                    Id = catethree.id,
+                    Name = catethree.name
+                };
+                categorytwo.SubCategory.Add(categorythree);
+                var onefloors = ViewJson.FirstOrDefault(t => t.Id == cateone.id);
+                var twofloors = onefloors.SubCategory.FirstOrDefault(t => t.Id == categorytwo.Id);
+                twofloors.SubCategory.Add(categorythree);
+            }
+            return JsonConvert.SerializeObject(ViewJson);
+        }
+
+
+        public mm getcate(int id)
+        {
+            mm mod = null;
+            string con = ConfigurationManager.ConnectionStrings["mysqlconnection1"].ToString();
+            using (MySqlConnection c = new MySqlConnection(con))
+            {
+                string sql = "select Id,Name,Path from lt_mall_categories where Id=" + id + "";
+                c.Open();
+                using (MySqlCommand com = new MySqlCommand(sql, c))
+                {
+                    using (var dr = com.ExecuteReader())
+                    {
+                        if (dr.HasRows)
+                        {
+                            while (dr.Read())
+                            {
+                                mod = new mm()
+                                {
+                                    id = Convert.ToInt32(dr[0]),
+                                    name = dr[1].ToString(),
+                                    path = dr[2].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            return mod;
+        }
+    }
+    public class testmodel
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+    }
+        public class CategoryJsonModel
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public List<SecondLevelCategory> SubCategory
+        {
+            get;
+            set;
+        }
+
+        public CategoryJsonModel()
+        {
+        }
+    }
+    public class SecondLevelCategory
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public List<ThirdLevelCategoty> SubCategory
+        {
+            get;
+            set;
+        }
+
+        public SecondLevelCategory()
+        {
+        }
+    }
+
+    public class ThirdLevelCategoty
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public ThirdLevelCategoty()
+        {
+        }
+    }
+    public class mm
+    {
+        public int id { set; get; }
+        public string name { set; get; }
+        public string path { set; get; }
+
+    }
+}

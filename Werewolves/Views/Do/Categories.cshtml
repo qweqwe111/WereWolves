@@ -1,0 +1,545 @@
+﻿
+@{
+    Layout = null;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/custom.css" rel="stylesheet" />
+<link href="~/Content/Site.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Categories</title>
+</head>
+<body>
+    <div id="id_a" class="ancestor" tabindex="5000" style="overflow: hidden; outline: none;"></div>
+
+    <div id="id_b" class="father" tabindex="5001" style="overflow: hidden; outline: none;"></div>
+    <div id="id_c" class="child" tabindex="5002" style="overflow: hidden; outline: none;"></div>
+    <script>
+        //var json = [{ name: '包包', id: 1, subchild: [{ name: '女式包', id: 2 }, { name: '男式包', id: 3, subchild: [{ name: '男士软包', id: 5 }] }, ] }, { name: '裤子', id: 1, subchild: [{ name: '女裤', id: 2 }, { name: '男裤', id: 3, subchild: [{ name: '男士牛仔裤', id: 5 }] }, ] }];
+
+        //$.each(json, function (i, v) {
+        //    $("<a class=\"select hover\" data_click=\"1\"><span data-id=\"0\" data-uid=" + v.id + ">" + v.name + "</span><i class=\"tag\">&gt;</i></a>").appendTo('#id_a');
+        //    $("#id_a a").bind("click", function () {
+        //        if (v.subchild) {
+        //            $.each(v.subchild, function (i, subv) {
+        //                $("<a class=\"select hover\" data_click=\"1\"><span data-id=\"0\" data-uid=" + subv.id + ">" + subv.name + "</span><i class=\"tag\">&gt;</i></a>").appendTo('#id_b');
+        //                $("#id_b a").bind("click", function () {
+        //                    if (subv.subchild) {
+        //                        $.each(subv.subchild, function (i, subtv) {
+        //                            $("<a class=\"select hover\" data_click=\"1\"><span data-id=\"0\" data-uid=" + subtv.id + ">" + subtv.name + "</span><i class=\"tag\">&gt;</i></a>").appendTo('#id_c');
+        //                        });
+        //                    }
+        //                });
+        //            });
+        //        }
+        //    });
+          
+        //});
+
+         
+
+    </script>
+    <script>
+
+    ; ({
+        a: [],// 一级分类数据
+        b: [],// 二级分类数据
+        clicka: null,
+        clickb: null,
+        clickc: null,
+        check: null,
+        checkId: null,
+        cuid: null,
+        story: null,
+        gobalData: null,// 后端取回来的全局数据 目前用于历史记录的数据还原
+        init: function ($, opt) {
+            var that = this,
+                callback = function ($, opt, data) {
+                    var number,
+                        obj = data,
+                        i;
+                    that.gobalData = data;
+                    //console.log(obj);
+                    for (var i = 0, len = obj.length; i < len; i++) {
+                        that.a.push(obj[i].Name);
+                    }
+                    var len = that.a.length,
+                        ancestor = $(opt.ancestor),
+                        child = $(opt.child),
+                        father = $(opt.father),
+                        next = $(opt.next),
+                        fn = function (elem, event, bool) {
+                            elem.bind(event, function (e) {
+                                if (e.target == elem[0] || (e.target.nodeName.toLowerCase() == 'a')) { return; }
+                                var str = $(e.target).html(), tagId = $(e.target).attr('data-id'),
+                                  data,
+                                  string = '',
+                                  i;
+                                if ($(e.target).attr('class') == 'tag') {
+                                    str = $(e.target).prev().html();
+                                }
+                                if (that.check && bool === 2) {
+                                    //console.log(tagId, obj[that.check])
+                                    data = obj[that.check].SubCategory[tagId].SubCategory;
+                                } else {
+                                    data = obj[tagId].SubCategory;
+                                }
+                                for (i = 0, len = data.length; i < len; i++) {
+                                    // if(parseInt(i)>=0){
+                                    //   string+='<a class="select"><span>'+data[i]+'</span></a>';
+                                    //   continue;
+                                    // }
+                                    if (data[i])
+                                        string += '<a class="select"><span data-id="' + i + '" data-uid="' + data[i].Id + '">' + data[i].Name + '</span><i class="tag">></i></a>';
+                                }
+                                if (bool === 1) {
+                                    that.clicka = str;
+                                    that.clickb = null;
+                                    that.cuid = $(e.target).attr('data-uid');
+                                    father.html(string);
+                                    child.html('');
+                                    that.check = tagId;
+                                    ancestor.children().each(function (i, n) {
+                                        var obj = $(n),
+                                            elem = $(e.target).parent(),
+                                            tag = obj.attr('data_click');
+                                        if (tag) {
+                                            obj.removeClass('hover');
+                                            obj.attr('data_click', '');
+                                            elem.addClass('hover');
+                                            elem.attr('data_click', '1');
+                                        } else {
+                                            elem.addClass('hover');
+                                            elem.attr('data_click', '1');
+                                        }
+                                    });
+                                } else if (bool === 2) {
+                                    that.clickb = str;
+                                    that.cuid = $(e.target).attr('data-uid');
+                                    that.clickc = null;
+                                    child.html(string);
+                                    father.children().each(function (i, n) {
+                                        var obj = $(n),
+                                            elem = $(e.target).parent(),
+                                            tag = obj.attr('data_click');
+                                        if (tag) {
+                                            obj.removeClass('hover');
+                                            obj.attr('data_click', '');
+                                            elem.addClass('hover');
+                                            elem.attr('data_click', '1');
+                                        } else {
+                                            elem.addClass('hover');
+                                            elem.attr('data_click', '1');
+                                        }
+                                    });
+                                }
+                                that.checkId = tagId;
+                            });
+                        },
+                        // 通过历史记录还原用户数据
+                        revert = function (data, history) {
+                            var arr = decodeURI(history).replace(/>/g, '&gt;').split('&gt;'),
+                                str1 = arr[0],
+                                str2 = arr[1],
+                                str3 = arr[2],
+                                string = '',
+                                i,
+                                data2;
+
+                            ancestor.children().find('span').each(function (i, e) {
+                                var obj = $(e),
+                                    u = 0,
+                                    parent = obj.parent(),
+                                    str = obj.html(),
+                                    tagId = obj.attr('data-id'),
+                                    tag = parent.attr('data_click');
+                                that.cuid = obj.attr('data-uid');
+                                that.checkId = tagId;
+                                // 用来清除样式上重复选取
+                                if (tag) {
+                                    parent.removeClass('hover');
+                                    parent.attr('data_click', '');
+                                }
+                                if (str == str1) {
+                                    parent.addClass('hover').attr('data_click', 1);
+                                    that.clicka = str1;
+                                    that.clickb = null;
+                                    that.check = tagId;// 保留当前数据缓存 数据还原的关键
+                                }
+                            });
+                            data2 = data[that.check].SubCategory;
+                            for (i = 0, n = data2.length; i < n; i++) {
+                                // if(parseInt(i)>=0){
+                                //   string+='<a class="select"><span>'+data2[i]+'</span></a>';
+                                //   continue;
+                                // }
+                                string += '<a class="select"><span data-id="' + i + '" data-uid="' + data2[i].Id + '">' + data2[i].Name + '</span><i class="tag">></i></a>';
+                            }
+                            father.html(string);
+                            i, string = ''; var fatherId;
+
+                            father.children().find('span').each(function (i, e) {
+                                var obj = $(e),
+                                    str = obj.html();
+
+                                if (str == str2) {
+                                    obj.parent().addClass('hover').attr('data_click', 1);
+                                    that.clickb = str2;
+                                    that.clickc = null;
+                                    that.cuid = obj.attr('data-uid');
+                                    fatherId = obj.attr('data-id');
+                                    that.checkId = fatherId;
+                                }
+                            });
+                            //-------------------------------生成三级分类
+                            if (that.check) {
+                                data2 = data[that.check].SubCategory[fatherId].SubCategory;
+                            }
+                            for (i = 0, n = data2.length; i < n; i++) {
+                                // if(parseInt(i)>=0){
+                                //   string+='<a class="select"><span data-id="'+i+'">'+data2[i].Name+'</span></a>';
+                                //   continue;
+                                // }
+                                // 恢复数据的时候用来还原最后一个分类id
+                                if (data2[i].Name == str3) {
+                                    that.cuid = data2[i].Id;
+                                }
+                                string += '<a class="select"><span data-id="' + that.check + '" data-uid="' + data2[i].Id + '">' + data2[i].Name + '</span><i class="tag">></i></a>';
+                            }
+                            child.html(string);
+                            child.children().find('span').each(function (i, e) {
+                                var obj = $(e),
+                                    str = obj.html();
+                                if (str == str3) {
+                                    obj.parent().addClass('hover').attr('data_click', 1);
+                                    that.clickc = str3;
+                                }
+                            });
+                        };
+                    child.bind('click', function (e) {
+                        //console.log('asdas')
+                        if (e.target == child[0]) { return; }
+                        var str = $(e.target).html(), cuid = $(e.target).attr('data-uid');
+                        that.cuid = cuid;;
+                        that.clickc = str;
+                        //that.checkId = $(e.target).attr('data-id');
+                        child.children().each(function (i, n) {
+                            var obj = $(n),
+                                elem = $(e.target).parent(),
+                                tag = obj.attr('data_click');
+                            if (tag) {
+                                obj.removeClass('hover');
+                                obj.attr('data_click', '');
+                                elem.addClass('hover');
+                                elem.attr('data_click', '1');
+                            } else {
+                                elem.addClass('hover');
+                                elem.attr('data_click', '1');
+                            }
+                        });
+                    });
+                    $('#id_d').bind('click', function (e) {
+                        if (e.target == $('#id_d')[0]) { return; }
+                        var obj = $(e.target),
+                            str = obj.html(),
+                            data = str.replace(/,/g, '&');
+
+                        that.story = data;
+                        //console.log(that.story)
+                        $('#id_d').children().each(function (i, n) {
+                            var obj = $(n),
+                                elem = $(e.target).parent(),
+                                tag = obj.attr('data_click');
+                            if (tag) {
+                                obj.removeClass('hover');
+                                obj.attr('data_click', '');
+                                elem.addClass('hover');
+                                elem.attr('data_click', '1');
+                            } else {
+                                elem.addClass('hover');
+                                elem.attr('data_click', '1');
+                            }
+                        });
+                        $('#id_w_tory').html(str);
+                        $('#id_d').slideUp(100);
+                        uid -= 1;
+                        $('#id_t').html('<i class="glyphicon glyphicon-chevron-down"></i>')
+                        revert(that.gobalData, data);
+                    });
+                    next.bind('click', function (e) {
+                        //if (that.story || (that.clicka && that.clickb && that.clickc)) {
+                        //    var str = (that.clicka && that.clickb && that.clickc) ? (that.clicka + ' > ' + that.clickb + ' > ' + that.clickc) : that.story;
+                        //    var cookieStr = (that.clicka && that.clickb && that.clickc) ? (that.clicka + '&' + that.clickb + '&' + that.clickc) : that.story;
+                        //    addCookie('history', cookieStr, 0);
+                        //    //alert(that.cuid);
+                        //    var url = './PublicStepTwo?categoryNames=' + str + '&categoryId=' + that.cuid;
+                        //    window.location.href = url;
+                        //} else {
+                        //    return false;
+                        //}
+                        //检测一共有几级分类
+                        //console.log(that.checkId, that.gobalData[that.check])
+						if(!that.story&&!that.checkId){
+							$.dialog.errorTips('请选择分类或常用分类！');
+							return;
+						}
+                        if (that.gobalData[that.check].SubCategory[that.checkId]) {
+                            if (that.gobalData[that.check].SubCategory[that.checkId].SubCategory[0]) {
+
+                                if (that.story || (that.clicka && that.clickb && that.clickc)) {
+                                    var s = 0;
+                                    $('#id_a,#id_b,#id_c').find('a').each(function () {
+                                        if ($(this).attr('data_click')) {
+                                            s += 1;
+                                        }
+                                    });
+                                    if (s != 3) { return false; }
+                                    //console.log(that.cuid)//最后一个商品分类id
+                                    var str = (that.clicka && that.clickb && that.clickc) ? (that.clicka + ' > ' + that.clickb + ' > ' + that.clickc) : that.story;
+                                    var cookieStr = (that.clicka && that.clickb && that.clickc) ? (that.clicka + '&' + that.clickb + '&' + that.clickc) : that.story;
+                                    addCookie('history', cookieStr, 0);
+                                    var url = './PublicStepTwo?categoryNames=' + str + '&categoryId=' + that.cuid + '&productId=' + opt.p;
+                                    //console.log('13123', '------------', url)
+                                    window.location.href = url;
+                                } else {
+									$.dialog.errorTips('请选择子级分类！');
+                                    return false;
+                                }
+                            } else {
+                                if (that.story || (that.clicka && that.clickb)) {
+                                    var s = 0;
+                                    $('#id_a,#id_b,#id_c').find('a').each(function () {
+                                        if ($(this).attr('data_click')) {
+                                            s += 1;
+                                        }
+                                    });
+                                    if (s != 3) { return false; }
+                                    //console.log(that.cuid)//最后一个商品分类id
+                                    var str = (that.clicka && that.clickb) ? (that.clicka + ' > ' + that.clickb) : that.story;
+                                    var cookieStr = (that.clicka && that.clickb) ? (that.clicka + '&' + that.clickb) : that.story;
+                                    addCookie('history', cookieStr, 0);
+                                    var url = './PublicStepTwo?categoryNames=' + str + '&categoryId=' + that.cuid + '&productId=' + opt.p;
+                                    //console.log('qweq', '------------', url)
+                                    window.location.href = url;
+                                } else {
+									$.dialog.errorTips('请选择子级分类！');
+                                    return false;
+                                }
+                            }
+                            return;
+                        } else {
+                            //console.log(that.cuid)//最后一个商品分类id
+                            if (that.story || (that.clicka)) {
+                                var s = 0;
+                                $('#id_a,#id_b,#id_c').find('a').each(function () {
+                                    if ($(this).attr('data_click')) {
+                                        s += 1;
+                                    }
+                                });
+                                if (s != 3) { return false; }
+                                var str = (that.clicka) ? (that.clicka) : that.story;
+                                //console.log('123123', str)
+                                var cookieStr = (that.clicka) ? (that.clicka) : that.story;
+                                addCookie('history', cookieStr, 0);
+                                var url = './PublicStepTwo?categoryNames=' + str + '&categoryId=' + that.cuid + '&productId=' + opt.p;
+                                //console.log('', '------------', url)
+                                window.location.href = url;
+                            } else {
+								$.dialog.errorTips('请选择子级分类！');
+                                return false;
+                            }
+                        }
+                    });
+                    for (var i = 0; i < len; i++) {
+                        ancestor.append('<a class="select"><span data-id="' + i + '" data-uid="' + data[i].Id + '">' + that.a[i] + '</span><i class="tag">></i></a>');
+                    }
+                    fn(ancestor, 'click', 1);
+                    fn(father, 'click', 2);
+                    var getQueryString = function () {
+                        var url = location.search,//获取url中"?"符后的字串
+                            theRequest = new Object();
+                        if (url.indexOf("?") != -1) {
+                            var str = url.substr(1);
+                            strs = str.split("&");
+                            for (var i = 0; i < strs.length; i++) {
+                                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+                            }
+                        } else {
+                            return false;
+                        }
+                        return theRequest;
+                    },
+                    opt = getQueryString();
+                    if (opt) { revert(that.gobalData, escape(opt.a + '>' + opt.b + '>' + opt.c), 1); }
+                },
+                ajax = function (types, url, d, test, ac) {
+                    if (test) {// 如果开启测试
+                        if (ac == 'red') {// 读数据测试
+                            // var json={
+                            //   "电脑":{"品牌机":{"1":"dell","2":"hp"},"电脑配件":{"1":"鼠标","2":"键盘"}},
+                            //   "服饰":{"男装":{"1":"T恤","2":"牛仔裤"},"女装":{"1":"T恤","2":"牛仔裤"}}
+                            // };
+                            var json = {
+                                "json": [{ "Name": "4", "Id": "1", "SubCategory": [{ "Name": "45", "Id": "3", "SubCategory": [{ "Id": "4", "Name": "4455" }] }, { "Name": "李宁1", "Id": "5", "SubCategory": [{ "Id": "4", "Name": "4455" }] }, { "Name": "999", "Id": "6", "SubCategory": [{ "Id": "4", "Name": "4455" }] }, { "Name": "4", "Id": "7", "SubCategory": [{ "Id": "4", "Name": "4455" }] }] }, { "Name": "987", "Id": "8", "SubCategory": [{ "Name": "111", "Id": "9", "SubCategory": [] }] }]
+                            };
+                            callback($, opt, json.json);
+                            return;
+                        } else if (ac == 'send') {
+                            //设置历史记录
+                            addCookie('history', d, 0);
+                            $('.ajax-loading').css('display', 'block');
+                            //window.location.href='http://www.baidu.com';//数据提交成功页面跳转
+                            return;
+                        }
+                    }
+                    if (ac == 'red') {
+                        $.ajax({
+                            type: types,
+                            url: url,
+                            data: d,
+                            dataType: "json",
+                            success: function (data) {
+                                callback($, opt, data.json);
+                            },
+                        });
+                    } else if (ac == 'send') {
+                        $('.ajax-loading').css('display', 'block');
+                        $.ajax({
+                            type: types,
+                            url: url,
+                            data: d,
+                            dataType: "html",
+                            success: function (data) {
+                                // 在这里设置cookie
+                                addCookie('history', d, 0);
+                                window.location.href = 'http://www.baidu.com';//数据提交成功页面跳转
+                            },
+                        });
+                    }
+                };
+            ajax('get', opt.url, '', 0, 'red');
+            getCookie('history')
+        }
+    }).init(jQuery, {
+        url: './GetAuthorizationCategory',
+        ancestor: '#id_a',
+        father: '#id_b',
+        child: '#id_c',
+        next: '#id_next'
+    });
+
+    // 以下为cookie取存 限制15条数据
+    function addCookie(name, val, time) {
+        var cookie = document.cookie, cookieArr = cookie.split('=');
+        for (var p = 0, x = cookieArr.length; p < x; p++) {
+            if (name == cookieArr[p]) {
+                cookie = cookieArr[(p + 1)];
+                break;
+            } else {
+                cookie = null;
+            }
+        }
+        var c = document.cookie;
+        if (cookie) {
+            var reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)"),
+                arr = c.match(reg),
+                str = val + ',';
+            //console.log('reg=', reg);
+            str += arr[2];
+            var result = getCookie('history', val, 1);// 对已存在的cookie对比
+            if (result) {
+                return;
+            }
+            document.cookie = name + '=' + str;
+        } else {
+            document.cookie = name + '=' + val;
+        }
+    }
+    function getCookie(name, string, bool) {
+        var cookie = document.cookie, cookieArr = cookie.split('=');
+        for (var p = 0, x = cookieArr.length; p < x; p++) {
+            if (name == cookieArr[p]) {
+                cookie = cookieArr[p];
+                break;
+            } else {
+                cookie = null;
+            }
+        }
+        if (!cookie) { return; }
+        var c = document.cookie,
+            reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)"),
+            arr = c.match(reg),
+            i = 0,
+            n = 0,
+            l,
+            sp,
+            obj = [],
+            len,
+            result,
+            str = '';
+        if (c) {
+            sp = arr[2].split(',');
+            len = sp.length;
+            for (i; i < len; i++) {
+                obj.push(sp[i]);
+            }
+            len = obj.length;
+            if (bool === 1) {
+                for (n; n < len; n++) {
+                    if (obj[n] == string) {
+                        result = true;
+                        return result;
+                    }
+                }
+            }
+            for (n; n < len; n++) {
+                obj[n].replace('&', ',');
+                if (n > 14) { break; }
+                str += '<div class="history"><a class="select">' + decodeURI(obj[n]).replace(/&/g, '>') + '</a></div>';
+            }
+            $('#id_d').html(str);
+        }
+    };
+	if(+[1,]){
+		$(".ancestor,.father,.child,.tory").niceScroll({
+			styler:'fb',
+			cursorcolor:"#7B7C7E",
+			cursorwidth: 6,
+		});
+	}
+    var uid = 0;
+    $('#id_story').bind('click', function (e) {
+        if (uid === 0) {
+            $('#id_d').css({
+                position: 'absolute',
+                display: 'block',
+                right: 0,
+                top: '57px',
+                background: '#fff',
+                zIndex: '999'
+            }).slideDown(100);
+            uid += 1;
+            $('#id_t').html('<i class="glyphicon glyphicon-chevron-up"></i>');
+        } else {
+            $('#id_d').css({
+                display: 'none'
+            });
+            uid -= 1;
+            $('#id_t').html('<i class="glyphicon glyphicon-chevron-down"></i>')
+        }
+    });
+    </script>
+
+</body>
+</html>
+<script src="~/Scripts/custom.js"></script>
+<script src="~/Scripts/CommonJS.js"></script>
+<script src="~/Scripts/jquery.cookie.js"></script>
+<script>
+
+</script>

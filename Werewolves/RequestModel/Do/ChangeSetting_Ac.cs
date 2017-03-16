@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Werewolves.RequestModel
+{
+    public class ChangeSetting_Request
+    {
+        /// <summary>
+        /// 房间ID
+        /// </summary>
+        public int RoomId { set; get; }
+        /// <summary>
+        /// 用户ID
+        /// </summary>
+        public int Userid { set; get; }
+        /// <summary>
+        /// 人数
+        /// </summary>
+        public int Pnum { set; get; }
+        /// <summary>
+        /// 胜利条件
+        /// </summary>
+        public int Victory { set; get; }
+        /// <summary>
+        /// 角色字符串
+        /// </summary>
+        public string roles { set; get; }
+    }
+    public class ChangeSetting_Response
+    {
+        /// <summary>
+        /// 座位分配 key:座位号 value:角色
+        /// </summary>
+        public Dictionary<int, string> positions { set; get; }
+        /// <summary>
+        /// 人数
+        /// </summary>
+        public int Pnum { set; get; }
+        /// <summary>
+        /// 胜利条件
+        /// </summary>
+        public Wwa.Enum.Victory Victory { set; get; }
+        /// <summary>
+        /// 房间号
+        /// </summary>
+        public int RoomID { set; get; }
+    }
+}

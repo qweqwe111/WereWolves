@@ -1,0 +1,1 @@
+房间创建失败:未找到具有固定名称“MySql.Data.MySqlClient”的 ADO.NET 提供程序的实体框架提供程序。请确保在应用程序配置文件的“entityFramework”节中注册了该提供程序。有关详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=260882。房间创建失败:支持“MysqlDbContext”上下文的模型已在数据库创建后发生更改。请考虑使用 Code First 迁移更新数据库(http://go.microsoft.com/fwlink/?LinkId=238269)。

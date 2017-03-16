@@ -1,0 +1,61 @@
+﻿<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+        is an ideal platform for building RESTful applications on the .NET Framework.</p>
+        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script>
+    ////?userid=2&Pnum=12&Victory=1&roles=1,2,3,3,3,3,2,1,2,2,1,1
+   
+    //json字符串如果是数组类型的例如[{name:value},{name:value}]  直接eval(jsonStr);
+    //如果是对象类型的看他返回的字符串是什么样的
+    //如果{name:value}这种形式的eval("("+jsonStr+")");   看返回数据有无()
+    //如果({name:value})这种形式的直接eval(jsonStr);
+    var dada = {
+        "RoomId": 752765,
+        "Userid": 2,
+        "Pnum": 13,
+        "Victory": 1,
+        "roles": "1,1,1,1,1,2,2,2,2,3,4,5,6"
+    };
+    $.ajax('/api/Do/GameAgain', {
+        dataType: 'json',
+        type: 'post',
+        data: dada,
+        success: function (Backdata) {
+            if (Backdata.state == 'success') {
+                alert(Backdata.data.positions);
+                //$.each(Backdata.data, function (i, v) {
+                //    alert(v.RoomId);
+                //});
+         
+                //$.each(daa, function (i, v) {
+                //    alert(i); alert(v.Key); alert(v.Values);
+                //});
+            }
+            else {
+                Backdata.message;
+                //alert(Backdata.message);
+            }
+        }
+    });
+</script>

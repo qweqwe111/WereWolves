@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Wwa.Entities;
+
+namespace Library.Randoms
+{
+    /// <summary>
+    /// 返回任意随意位数的数字
+    /// </summary>
+    public class Number
+    {
+        public static int many = Convert.ToInt32(Configs.GetValue("roomkey"));
+        /// <summary>
+        /// 返回随机数(强制转换)
+        /// </summary>
+        /// <param name="many">几位随机数,最高不超过6</param>
+        /// <returns></returns>
+        public static int GetByPower()
+        {
+            //if (many < 0 || many > 6) many = 6; 
+            Random r = new Random();
+            int num = r.Next((int)Math.Pow(10, many), (int)(Math.Pow(10, many + 1) - 1));
+            //double min=Math.Pow(10, many) ,max=Math.Pow(10, many + 1) - 1;
+            using (MysqlDbContext db = new MysqlDbContext())
+            {
+                var res = db.Rooms.Where(t => t.RoomId == num && t.IsQuit == false).FirstOrDefault();
+                if (res == null)
+                {
+                    return num;
+                }
+                else
+                {
+                    return GetByPower();
+                }
+            }
+
+
+        }
+        public static string GetByBox()
+        {
+            // if (many < 0 || many > 6) many = 6;
+            StringBuilder sb = new StringBuilder();
+            Random r1 = new Random();
+            for (int i = 0; i < many; i++)
+            {
+                sb.Append(r1.Next(0, 10));
+            }
+            return sb.ToString();
+            //int many3 = 20;
+            //string s = "";
+            //Random r3 = new Random();
+            //for (int i = 0; i < many3; i++)
+            //{
+            //    s += r3.Next(0, 10);
+            //}
+        }
+    }
+}

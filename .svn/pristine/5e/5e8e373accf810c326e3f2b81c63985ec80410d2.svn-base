@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Wwa.Entities
+{
+    public class MysqlDbContext:DbContext
+    {
+        //Enable Migration
+        // Add-Migration record
+        //update-database
+        public MysqlDbContext():base("mysqlconnection")
+        {
+
+        }
+        public DbSet<User> Users { set; get; }
+        public DbSet<Rooms> Rooms { set; get; }
+        public DbSet<RoomRole> RoomRoles { set; get; }
+    }
+}

@@ -1,0 +1,32 @@
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\App.dll.config
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\App.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\App.pdb
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\Dapper.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\Entities.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\EntityFramework.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\MySql.Data.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\MySql.Data.Entity.EF6.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\Entities.pdb
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\Dapper.xml
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\EntityFramework.xml
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\obj\Debug\App.csprojResolveAssemblyReference.cache
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\obj\Debug\App.dll
+C:\Users\syb\Documents\Visual Studio 2015\Projects\Assistant`hg\App\obj\Debug\App.pdb
+D:\SVNWerewloves\App\bin\Debug\App.dll.config
+D:\SVNWerewloves\App\bin\Debug\App.dll
+D:\SVNWerewloves\App\bin\Debug\App.pdb
+D:\SVNWerewloves\App\bin\Debug\Dapper.dll
+D:\SVNWerewloves\App\bin\Debug\Entities.dll
+D:\SVNWerewloves\App\bin\Debug\EntityFramework.dll
+D:\SVNWerewloves\App\bin\Debug\EntityFramework.SqlServer.dll
+D:\SVNWerewloves\App\bin\Debug\MySql.Data.dll
+D:\SVNWerewloves\App\bin\Debug\MySql.Data.Entity.EF6.dll
+D:\SVNWerewloves\App\bin\Debug\Entities.pdb
+D:\SVNWerewloves\App\bin\Debug\Dapper.xml
+D:\SVNWerewloves\App\bin\Debug\EntityFramework.xml
+D:\SVNWerewloves\App\bin\Debug\EntityFramework.SqlServer.xml
+D:\SVNWerewloves\App\obj\Debug\App.csprojResolveAssemblyReference.cache
+D:\SVNWerewloves\App\obj\Debug\App.dll
+D:\SVNWerewloves\App\obj\Debug\App.pdb
